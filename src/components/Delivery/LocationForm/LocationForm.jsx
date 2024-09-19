@@ -10,8 +10,8 @@ import GoogleMaps from '../GoogleMaps/GoogleMaps';
 const { Title } = Typography;
 
 const initialAddress = {
-  lat: 50.4509744349761,
-  lng: 30.541252783203127,
+  lat: 38.7816336,
+  lng: -9.1640982,
 };
 
 const DeliveryForm = () => {
