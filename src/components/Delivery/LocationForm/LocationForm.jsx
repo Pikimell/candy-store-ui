@@ -1,24 +1,82 @@
+import React, { useState } from 'react';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import axios from 'axios';
+import { Button, Flex, Typography } from 'antd';
+import { getDistancePrice } from '../../../api/googleMapsApi';
+import { useEffect } from 'react';
+import { getLocation } from '../../../helpers/geolocation';
 import style from './LocationForm.module.css';
-import { useState } from 'react';
+import GoogleMaps from '../GoogleMaps/GoogleMaps';
+const { Title } = Typography;
 
-const LocationForm = ({}) => {
+const initialAddress = {
+  lat: 50.4509744349761,
+  lng: 30.541252783203127,
+};
+
+const DeliveryForm = () => {
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [center, setCenterLocation] = useState(null);
+  const [deliveryCost, setDeliveryCost] = useState(null);
+
+  const calculateDistance = async () => {
+    if (!selectedLocation) {
+      alert('Please select a location on the map.');
+      return;
+    }
+
+    const destination = `${selectedLocation.lat},${selectedLocation.lng}`;
+    const origin = `${initialAddress.lat},${initialAddress.lng}`;
+
+    const result = await getDistancePrice(origin, destination);
+
+    setDeliveryCost(result.cost);
+  };
+
+  const handleMapClick = e => {
+    setSelectedLocation({
+      lat: e.latLng.lat(),
+      lng: e.latLng.lng(),
+    });
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getLocation();
+        setCenterLocation(data);
+      } catch {}
+    }
+
+    fetchData();
+  }, []);
+
   return (
-    <div className="nes-container is-rounded">
-      <form className={style.form}>
-        <div class="nes-field">
-          <label for="loc1">Location 1</label>
-          <input type="text" id="loc1" name="loc1" class="nes-input" />
-        </div>
+    <Flex className={style.form} vertical align="center" justify="center">
+      <Title level={3}>Calculate Delivery Cost</Title>
 
-        <div class="nes-field">
-          <label for="loc2">Location 1</label>
-          <input type="text" id="loc2" name="loc2" class="nes-input" />
-        </div>
+      <GoogleMaps
+        center={center}
+        select={selectedLocation}
+        init={initialAddress}
+        handleClick={handleMapClick}
+      />
 
-        <button className="nes-btn is-primary">Update Price</button>
-      </form>
-    </div>
+      <Button
+        type="primary"
+        onClick={calculateDistance}
+        style={{ marginTop: '20px' }}
+      >
+        Calculate Delivery Cost
+      </Button>
+
+      {deliveryCost && (
+        <div style={{ marginTop: '20px' }}>
+          <Title level={4}>Delivery Cost: €{deliveryCost}</Title>
+        </div>
+      )}
+    </Flex>
   );
 };
 
-export default LocationForm;
+export default DeliveryForm;
