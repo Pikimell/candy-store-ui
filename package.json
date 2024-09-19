@@ -11,6 +11,7 @@
     "push": "git cmp 'update'"
   },
   "dependencies": {
+    "@react-google-maps/api": "^2.19.3",
     "@reduxjs/toolkit": "^2.2.3",
     "antd": "^5.18.2",
     "axios": "^1.7.2",
